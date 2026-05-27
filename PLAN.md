@@ -25,19 +25,19 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 ## Этап 0: Инициализация проектов
 
-- [ ] Создать backend:
+- [x] Создать backend:
   ```bash
   nest new backend --skip-git --package-manager npm
   ```
-- [ ] Создать frontend:
+- [x] Создать frontend:
   ```bash
   ng new frontend --routing --style css --skip-git
   ```
-- [ ] Установить Prisma в backend:
+- [x] Установить Prisma в backend:
   ```bash
   cd backend && npm install prisma @prisma/client
   ```
-- [ ] Проверить сборку frontend:
+- [x] Проверить сборку frontend:
   ```bash
   cd frontend && ng build
   ```
