@@ -1,0 +1,21 @@
+{
+  "name": "ai-for-developers-project-386",
+  "version": "1.0.0",
+  "description": "[![Actions Status](https://github.com/KulikovAlexej/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/KulikovAlexej/ai-for-developers-project-386/actions)",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsp compile specs/calendar.tsp --output-dir specs/generated --emit @typespec/openapi3",
+    "mock": "prism mock specs/generated/@typespec/openapi3/openapi.yaml --port 4010",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@stoplight/prism-cli": "^5.14.2",
+    "@typespec/compiler": "^1.12.0",
+    "@typespec/http": "^1.12.0",
+    "@typespec/openapi3": "^1.12.0",
+    "@typespec/rest": "^0.82.0"
+  }
+}

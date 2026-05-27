@@ -1,18 +1,15 @@
-// Calendar API Specification — упрощенный аналог cal.com
-// Owner: один предустановленный владелец календаря
-// Guest: бронирует слоты без регистрации и авторизации
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/openapi3";
 
 using TypeSpec.Http;
-
-// ─── Скалярные типы ──────────────────────────────────────────────────────────
+using TypeSpec.Rest;
 
 @doc("UUID идентификатор")
 scalar uuid extends string;
 
 @doc("Дата и время в UTC")
-scalar utcDateTime extends string;
-
-// ─── Модели данных ───────────────────────────────────────────────────────────
+scalar UtcDateTime extends string;
 
 @doc("Тип события, создаваемый владельцем календаря")
 model EventType {
@@ -28,12 +25,10 @@ model Booking {
   eventTypeId: uuid;
   guestName: string;
   guestEmail: string;
-  startTime: utcDateTime;
-  endTime: utcDateTime;
-  createdAt: utcDateTime;
+  startTime: UtcDateTime;
+  endTime: UtcDateTime;
+  createdAt: UtcDateTime;
 }
-
-// ─── Request / Response модели ──────────────────────────────────────────────
 
 @doc("Запрос на создание типа события")
 model CreateEventTypeRequest {
@@ -54,16 +49,14 @@ model CreateBookingRequest {
   eventTypeId: uuid;
   guestName: string;
   guestEmail: string;
-  startTime: utcDateTime;
+  startTime: UtcDateTime;
 }
 
 @doc("Свободный временной слот")
 model Slot {
-  startTime: utcDateTime;
-  endTime: utcDateTime;
+  startTime: UtcDateTime;
+  endTime: UtcDateTime;
 }
-
-// ─── Модели ошибок ──────────────────────────────────────────────────────────
 
 @doc("Бронирование пересекается с существующим")
 model ConflictError {
@@ -84,15 +77,10 @@ model ValidationError {
   details: string[];
 }
 
-// ─── API ─────────────────────────────────────────────────────────────────────
-
-@service({
+@service(#{
   title: "Calendar API",
-  version: "1.0.0",
 })
 namespace CalendarApi {
-
-  // ── Event Types ────────────────────────────────────────────────────────────
 
   @route("/api/event-types")
   interface EventTypes {
@@ -113,8 +101,6 @@ namespace CalendarApi {
     @delete op delete(@path id: uuid): void | NotFoundError;
   }
 
-  // ── Slots ──────────────────────────────────────────────────────────────────
-
   @doc("Получить свободные слоты для типа события")
   @route("/api/event-types/{id}/slots")
   interface Slots {
@@ -123,13 +109,11 @@ namespace CalendarApi {
     @get op getAvailableSlots(
       @path id: uuid,
       @doc("Начало окна (UTC)")
-      @query from: utcDateTime,
+      @query from: UtcDateTime,
       @doc("Конец окна (UTC)")
-      @query to: utcDateTime
+      @query to: UtcDateTime
     ): Slot[] | NotFoundError;
   }
-
-  // ── Bookings ───────────────────────────────────────────────────────────────
 
   @route("/api/bookings")
   interface Bookings {

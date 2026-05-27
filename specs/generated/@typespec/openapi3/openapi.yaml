@@ -1,0 +1,302 @@
+openapi: 3.0.0
+info:
+  title: Calendar API
+  version: 0.0.0
+tags: []
+paths:
+  /api/bookings:
+    get:
+      operationId: Bookings_list
+      description: Получить список всех будущих броней (admin)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+    post:
+      operationId: Bookings_create
+      description: Создать новое бронирование (гость)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/Booking'
+                  - $ref: '#/components/schemas/ConflictError'
+                  - $ref: '#/components/schemas/ValidationError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+  /api/event-types:
+    get:
+      operationId: EventTypes_list
+      description: Получить список всех типов событий (публично)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+    post:
+      operationId: EventTypes_create
+      description: Создать новый тип события (admin)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventType'
+                  - $ref: '#/components/schemas/ValidationError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventTypeRequest'
+  /api/event-types/{id}:
+    patch:
+      operationId: EventTypes_update
+      description: Обновить существующий тип события (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventType'
+                  - $ref: '#/components/schemas/NotFoundError'
+                  - $ref: '#/components/schemas/ValidationError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventTypeRequest'
+    delete:
+      operationId: EventTypes_delete
+      description: Удалить тип события (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+  /api/event-types/{id}/slots:
+    get:
+      operationId: Slots_getAvailableSlots
+      description: Возвращает свободные слоты в указанном диапазоне дат
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+        - name: from
+          in: query
+          required: true
+          description: Начало окна (UTC)
+          schema:
+            $ref: '#/components/schemas/UtcDateTime'
+          explode: false
+        - name: to
+          in: query
+          required: true
+          description: Конец окна (UTC)
+          schema:
+            $ref: '#/components/schemas/UtcDateTime'
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Slot'
+                  - $ref: '#/components/schemas/NotFoundError'
+components:
+  schemas:
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - guestName
+        - guestEmail
+        - startTime
+        - endTime
+        - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        eventTypeId:
+          $ref: '#/components/schemas/uuid'
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        startTime:
+          $ref: '#/components/schemas/UtcDateTime'
+        endTime:
+          $ref: '#/components/schemas/UtcDateTime'
+        createdAt:
+          $ref: '#/components/schemas/UtcDateTime'
+      description: Бронирование, созданное гостем на выбранный слот
+    ConflictError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - CONFLICT
+        message:
+          type: string
+      description: Бронирование пересекается с существующим
+    CreateBookingRequest:
+      type: object
+      required:
+        - eventTypeId
+        - guestName
+        - guestEmail
+        - startTime
+      properties:
+        eventTypeId:
+          $ref: '#/components/schemas/uuid'
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        startTime:
+          $ref: '#/components/schemas/UtcDateTime'
+      description: Запрос на создание бронирования
+    CreateEventTypeRequest:
+      type: object
+      required:
+        - title
+        - description
+        - duration
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: integer
+          format: int32
+      description: Запрос на создание типа события
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - duration
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: integer
+          format: int32
+      description: Тип события, создаваемый владельцем календаря
+    NotFoundError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - NOT_FOUND
+        message:
+          type: string
+      description: Ресурс не найден
+    Slot:
+      type: object
+      required:
+        - startTime
+        - endTime
+      properties:
+        startTime:
+          $ref: '#/components/schemas/UtcDateTime'
+        endTime:
+          $ref: '#/components/schemas/UtcDateTime'
+      description: Свободный временной слот
+    UpdateEventTypeRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: integer
+          format: int32
+      description: Запрос на обновление типа события
+    UtcDateTime:
+      type: string
+      description: Дата и время в UTC
+    ValidationError:
+      type: object
+      required:
+        - code
+        - message
+        - details
+      properties:
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+      description: Ошибка валидации входных данных
+    uuid:
+      type: string
+      description: UUID идентификатор

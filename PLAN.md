@@ -46,26 +46,26 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 ## Этап 1: TypeSpec → OpenAPI → Prism
 
-- [ ] Установить TypeSpec CLI:
+- [x] Установить TypeSpec CLI:
   ```bash
   npm install -D @typespec/compiler @typespec/http @typespec/rest @typespec/openapi3
   ```
-- [ ] Создать `specs/calendar.tsp` (уже готов)
-- [ ] Скомпилировать TypeSpec в OpenAPI 3.0:
+- [x] Создать `specs/calendar.tsp` (уже готов)
+- [x] Скомпилировать TypeSpec в OpenAPI 3.0:
   ```bash
   npx tsp compile specs/calendar.tsp --output-dir specs/generated
   ```
-- [ ] Установить Prism:
+- [x] Установить Prism:
   ```bash
   npm install -D @stoplight/prism-cli
   ```
-- [ ] Создать npm-скрипт для запуска mock-сервера:
+- [x] Создать npm-скрипт для запуска mock-сервера:
   ```json
   "scripts": {
     "mock": "prism mock specs/generated/openapi.yaml --port 4010"
   }
   ```
-- [ ] Проверить, что Prism отвечает:
+- [x] Проверить, что Prism отвечает:
   ```bash
   curl http://localhost:4010/api/event-types
   # → [{ id: "…", title: "…", description: "…", duration: 30 }]
