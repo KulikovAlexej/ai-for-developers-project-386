@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "tsp compile specs/calendar.tsp --output-dir specs/generated --emit @typespec/openapi3",
+    "generate:models": "node scripts/generate-models.js",
     "mock": "prism mock specs/generated/@typespec/openapi3/openapi.yaml --port 4010",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,6 +17,7 @@
     "@typespec/compiler": "^1.12.0",
     "@typespec/http": "^1.12.0",
     "@typespec/openapi3": "^1.12.0",
-    "@typespec/rest": "^0.82.0"
+    "@typespec/rest": "^0.82.0",
+    "yaml": "^2.9.0"
   }
 }

@@ -75,20 +75,20 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 ## Этап 2: Angular — сервисы и модели (по OpenAPI)
 
-- [ ] Сгенерировать TypeScript-типы из OpenAPI (или написать вручную):
+- [x] Сгенерировать TypeScript-типы из OpenAPI (или написать вручную):
   - `EventType` — `id`, `title`, `description`, `duration`
   - `Booking` — `id`, `eventTypeId`, `guestName`, `guestEmail`, `startTime`, `endTime`, `createdAt`
   - `Slot` — `startTime`, `endTime`
   - `CreateEventTypeRequest`, `CreateBookingRequest`
   - `ConflictError`, `NotFoundError`, `ValidationError`
-- [ ] Создать `ApiService` — обёртка над `HttpClient`:
+- [x] Создать `ApiService` — обёртка над `HttpClient`:
   - Базовый URL: `http://localhost:4010/api` (переключаемый)
   - Методы: `get`, `post`, `patch`, `delete`
-- [ ] Создать сервисы:
+- [x] Создать сервисы:
   - `EventTypesService`
   - `BookingsService`
   - `SlotsService`
-- [ ] Настроить маршрутизацию:
+- [x] Настроить маршрутизацию:
   ```typescript
   const routes: Routes = [
     { path: '', component: EventTypesListComponent },
@@ -98,7 +98,7 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
     { path: 'admin/bookings', component: AdminBookingsComponent },
   ];
   ```
-- [ ] Добавить `provideHttpClient()` в `app.config.ts`
+- [x] Добавить `provideHttpClient()` в `app.config.ts`
 
 ---
 
