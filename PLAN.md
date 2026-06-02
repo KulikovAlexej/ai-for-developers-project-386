@@ -104,7 +104,7 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 ## Этап 3: Angular — Публичная часть (гость)
 
-- [ ] **`EventTypesListComponent`** — страница со списком типов событий
+- [x] **`EventTypesListComponent`** — страница со списком типов событий
   - `GET /api/event-types`
   - Карточка: название, описание, длительность
   - Кнопка «Записаться» → переход на `/book/:id`

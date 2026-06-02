@@ -1,1 +1,122 @@
-<p>booking works!</p>
+@if (loading()) {
+  <div class="spinner-container">
+    <mat-spinner diameter="48" />
+  </div>
+} @else if (error(); as errMsg) {
+  <mat-card appearance="outlined" class="state-card">
+    <mat-card-content>
+      <p class="error-text">{{ errMsg }}</p>
+    </mat-card-content>
+  </mat-card>
+} @else if (bookingResult(); as result) {
+  <div class="booking-container">
+    <mat-card appearance="outlined" class="confirmation-card">
+      <mat-card-header>
+        <mat-card-title>Booking confirmed!</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (eventType(); as et) {
+          <p class="confirmation-event">{{ et.title }}</p>
+        }
+        <p class="confirmation-time">{{ result.startTime | date:'fullDate' }}</p>
+        <p class="confirmation-time">{{ result.startTime | date:'HH:mm' }} – {{ result.endTime | date:'HH:mm' }}</p>
+        <p>{{ result.guestName }} · {{ result.guestEmail }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+} @else {
+  <div class="booking-container">
+    @if (eventType(); as et) {
+      <mat-card appearance="outlined" class="event-type-card">
+        <mat-card-header>
+          <mat-card-title>{{ et.title }}</mat-card-title>
+          <mat-card-subtitle>{{ et.duration }} min</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ et.description }}</p>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <mat-card appearance="outlined" class="calendar-card">
+      <mat-card-content>
+        <mat-calendar
+          [minDate]="today"
+          [maxDate]="maxDate"
+          (selectedChange)="onDateSelected($event)"
+        />
+      </mat-card-content>
+    </mat-card>
+
+    @if (selectedDate(); as date) {
+      <mat-card appearance="outlined" class="slots-card">
+        <mat-card-content>
+          <h3>Available slots for {{ date | date:'fullDate' }}</h3>
+          @if (slotsLoading()) {
+            <div class="spinner-container small">
+              <mat-spinner diameter="32" />
+            </div>
+          } @else if (slots().length === 0) {
+            <p class="empty-text">No available slots for this date</p>
+          } @else {
+            <div class="slots-grid">
+              @for (slot of slots(); track slot.startTime) {
+                <button
+                  mat-stroked-button
+                  class="slot-btn"
+                  [class.selected]="selectedSlot()?.startTime === slot.startTime"
+                  (click)="selectSlot(slot)"
+                >
+                  {{ slot.startTime | date:'HH:mm' }} – {{ slot.endTime | date:'HH:mm' }}
+                </button>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (selectedSlot(); as slot) {
+      <mat-card appearance="outlined" class="form-card">
+        <mat-card-content>
+          <h3>Your details</h3>
+          <p class="selected-time">
+            Selected: {{ slot.startTime | date:'HH:mm' }} – {{ slot.endTime | date:'HH:mm' }}
+          </p>
+          <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+            <mat-form-field class="full-width">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="guestName" />
+              @if (bookingForm.controls.guestName.hasError('required') && bookingForm.controls.guestName.touched) {
+                <mat-error>Name is required</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="guestEmail" type="email" />
+              @if (bookingForm.controls.guestEmail.hasError('required') && bookingForm.controls.guestEmail.touched) {
+                <mat-error>Email is required</mat-error>
+              }
+              @if (bookingForm.controls.guestEmail.hasError('email') && bookingForm.controls.guestEmail.touched) {
+                <mat-error>Enter a valid email</mat-error>
+              }
+            </mat-form-field>
+            @if (conflictError(); as errMsg) {
+              <p class="error-text">{{ errMsg }}</p>
+            }
+            <div class="form-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="bookingForm.invalid || submitting()"
+              >
+                {{ submitting() ? 'Booking...' : 'Confirm booking' }}
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+}

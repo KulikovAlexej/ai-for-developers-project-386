@@ -1,0 +1,74 @@
+.booking-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+.spinner-container.small {
+  padding: 16px;
+}
+
+.state-card {
+  max-width: 400px;
+  margin: 24px auto;
+}
+
+.error-text {
+  color: #f44336;
+  margin: 8px 0;
+}
+
+.empty-text {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.event-type-card mat-card-title {
+  font-size: 1.5rem;
+}
+
+.confirmation-card {
+  text-align: center;
+}
+
+.confirmation-event {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 8px 0;
+}
+
+.confirmation-time {
+  margin: 4px 0;
+}
+
+.slots-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.slot-btn.selected {
+  background-color: #1976d2;
+  color: white;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  margin-top: 16px;
+}
+
+.selected-time {
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 16px;
+}
