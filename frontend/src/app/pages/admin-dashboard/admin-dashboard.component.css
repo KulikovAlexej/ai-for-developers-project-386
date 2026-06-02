@@ -1,0 +1,86 @@
+.admin-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.admin-toolbar nav {
+  display: flex;
+  gap: 4px;
+}
+
+.active-link {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.welcome {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.welcome h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 16px;
+  margin: 0;
+}
+
+.nav-cards {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.nav-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+  min-width: 240px;
+  max-width: 320px;
+  flex: 1;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.nav-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  color: #1976d2;
+}
+
+.nav-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.nav-card p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+}

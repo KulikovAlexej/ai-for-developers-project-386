@@ -108,29 +108,29 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
   - `GET /api/event-types`
   - Карточка: название, описание, длительность
   - Кнопка «Записаться» → переход на `/book/:id`
-- [ ] **`BookingComponent`** — страница бронирования
+- [x] **`BookingComponent`** — страница бронирования
   - Получить `eventType` по `:id`
   - Отобразить календарь на 14 дней
   - При выборе даты → `GET /api/event-types/:id/slots?from=...&to=...`
   - Форма: имя, email, выбор свободного слота
   - `POST /api/bookings`
   - Страница подтверждения / ошибки
-- [ ] **Компонент календаря** — кастомный или из библиотеки (например, Angular CDK datepicker или простой грид)
+- [x] **Компонент календаря** — кастомный или из библиотеки (например, Angular CDK datepicker или простой грид)
 
 ---
 
 ## Этап 4: Angular — Админ-панель
 
-- [ ] **`AdminEventTypesComponent`**
+- [x] **`AdminEventTypesComponent`**
   - Таблица типов событий
   - Форма создания (POST /api/event-types)
   - Форма редактирования (PATCH /api/event-types/:id)
   - Кнопка удаления с подтверждением (DELETE /api/event-types/:id)
-- [ ] **`AdminBookingsComponent`**
+- [x] **`AdminBookingsComponent`**
   - `GET /api/bookings` — список всех броней
   - Таблица: дата, время, гость, email, тип события
   - Сортировка по дате
-- [ ] **`AdminDashboardComponent`** — навигационная страница админки
+- [x] **`AdminDashboardComponent`** — навигационная страница админки
   - Ссылки на управление типами и просмотр броней
 
 ---

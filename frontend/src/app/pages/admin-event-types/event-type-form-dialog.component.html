@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Event Type' : 'Create Event Type' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" />
+      @if (form.controls.title.hasError('required')) {
+        <mat-error>Title is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+      @if (form.controls.description.hasError('required')) {
+        <mat-error>Description is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Duration (minutes)</mat-label>
+      <input matInput type="number" formControlName="duration" />
+      @if (form.controls.duration.hasError('required')) {
+        <mat-error>Duration is required</mat-error>
+      }
+      @if (form.controls.duration.hasError('min')) {
+        <mat-error>Minimum duration is 15 minutes</mat-error>
+      }
+    </mat-form-field>
+
+    @if (submitError) {
+      <p class="error">{{ submitError }}</p>
+    }
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="submit()" [disabled]="form.invalid">
+    {{ isEdit ? 'Save' : 'Create' }}
+  </button>
+</mat-dialog-actions>
