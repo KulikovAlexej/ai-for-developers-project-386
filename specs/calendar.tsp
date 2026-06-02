@@ -9,7 +9,7 @@ using TypeSpec.Rest;
 scalar uuid extends string;
 
 @doc("Дата и время в UTC")
-scalar UtcDateTime extends string;
+scalar UtcDateTime extends TypeSpec.utcDateTime;
 
 @doc("Тип события, создаваемый владельцем календаря")
 model EventType {

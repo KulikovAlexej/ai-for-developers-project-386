@@ -296,6 +296,7 @@ components:
       description: Запрос на обновление типа события
     UtcDateTime:
       type: string
+      format: date-time
       description: Дата и время в UTC
     ValidationError:
       type: object
