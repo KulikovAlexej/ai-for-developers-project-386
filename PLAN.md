@@ -75,20 +75,20 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 ## Этап 2: Angular — сервисы и модели (по OpenAPI)
 
-- [ ] Сгенерировать TypeScript-типы из OpenAPI (или написать вручную):
+- [x] Сгенерировать TypeScript-типы из OpenAPI (или написать вручную):
   - `EventType` — `id`, `title`, `description`, `duration`
   - `Booking` — `id`, `eventTypeId`, `guestName`, `guestEmail`, `startTime`, `endTime`, `createdAt`
   - `Slot` — `startTime`, `endTime`
   - `CreateEventTypeRequest`, `CreateBookingRequest`
   - `ConflictError`, `NotFoundError`, `ValidationError`
-- [ ] Создать `ApiService` — обёртка над `HttpClient`:
+- [x] Создать `ApiService` — обёртка над `HttpClient`:
   - Базовый URL: `http://localhost:4010/api` (переключаемый)
   - Методы: `get`, `post`, `patch`, `delete`
-- [ ] Создать сервисы:
+- [x] Создать сервисы:
   - `EventTypesService`
   - `BookingsService`
   - `SlotsService`
-- [ ] Настроить маршрутизацию:
+- [x] Настроить маршрутизацию:
   ```typescript
   const routes: Routes = [
     { path: '', component: EventTypesListComponent },
@@ -98,39 +98,39 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
     { path: 'admin/bookings', component: AdminBookingsComponent },
   ];
   ```
-- [ ] Добавить `provideHttpClient()` в `app.config.ts`
+- [x] Добавить `provideHttpClient()` в `app.config.ts`
 
 ---
 
 ## Этап 3: Angular — Публичная часть (гость)
 
-- [ ] **`EventTypesListComponent`** — страница со списком типов событий
+- [x] **`EventTypesListComponent`** — страница со списком типов событий
   - `GET /api/event-types`
   - Карточка: название, описание, длительность
   - Кнопка «Записаться» → переход на `/book/:id`
-- [ ] **`BookingComponent`** — страница бронирования
+- [x] **`BookingComponent`** — страница бронирования
   - Получить `eventType` по `:id`
   - Отобразить календарь на 14 дней
   - При выборе даты → `GET /api/event-types/:id/slots?from=...&to=...`
   - Форма: имя, email, выбор свободного слота
   - `POST /api/bookings`
   - Страница подтверждения / ошибки
-- [ ] **Компонент календаря** — кастомный или из библиотеки (например, Angular CDK datepicker или простой грид)
+- [x] **Компонент календаря** — кастомный или из библиотеки (например, Angular CDK datepicker или простой грид)
 
 ---
 
 ## Этап 4: Angular — Админ-панель
 
-- [ ] **`AdminEventTypesComponent`**
+- [x] **`AdminEventTypesComponent`**
   - Таблица типов событий
   - Форма создания (POST /api/event-types)
   - Форма редактирования (PATCH /api/event-types/:id)
   - Кнопка удаления с подтверждением (DELETE /api/event-types/:id)
-- [ ] **`AdminBookingsComponent`**
+- [x] **`AdminBookingsComponent`**
   - `GET /api/bookings` — список всех броней
   - Таблица: дата, время, гость, email, тип события
   - Сортировка по дате
-- [ ] **`AdminDashboardComponent`** — навигационная страница админки
+- [x] **`AdminDashboardComponent`** — навигационная страница админки
   - Ссылки на управление типами и просмотр броней
 
 ---

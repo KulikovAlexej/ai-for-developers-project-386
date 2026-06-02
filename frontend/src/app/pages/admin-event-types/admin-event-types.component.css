@@ -1,0 +1,56 @@
+.admin-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.admin-toolbar nav {
+  display: flex;
+  gap: 4px;
+}
+
+.active-link {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.state-card {
+  text-align: center;
+  padding: 32px;
+}
+
+.error-text {
+  color: var(--mat-form-field-error-color, #f44336);
+  margin: 0;
+}
+
+.event-types-table {
+  width: 100%;
+}

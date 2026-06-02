@@ -9,7 +9,7 @@ using TypeSpec.Rest;
 scalar uuid extends string;
 
 @doc("Дата и время в UTC")
-scalar UtcDateTime extends string;
+scalar UtcDateTime extends TypeSpec.utcDateTime;
 
 @doc("Тип события, создаваемый владельцем календаря")
 model EventType {
@@ -87,6 +87,9 @@ namespace CalendarApi {
 
     @doc("Получить список всех типов событий (публично)")
     @get op list(): EventType[];
+
+    @doc("Получить тип события по ID (публично)")
+    @get op getEventType(@path id: uuid): EventType | NotFoundError;
 
     @doc("Создать новый тип события (admin)")
     @post op create(@body body: CreateEventTypeRequest): EventType | ValidationError;
