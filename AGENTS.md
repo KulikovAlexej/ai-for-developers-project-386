@@ -8,6 +8,7 @@ Calendar Booking — аналог cal.com. Приложение для брон�
 | ORM            | Prisma 5                           |
 | БД             | PostgreSQL                         |
 | Спецификация   | TypeSpec → OpenAPI 3.0             |
+| Стилизация     | Angular Material                   |
 | Mock-сервер    | Stoplight Prism                    |
 | Тесты (front)  | Vitest 4                           |
 | Тесты (back)   | Jest 30 + Supertest                |
@@ -66,8 +67,10 @@ Calendar Booking — аналог cal.com. Приложение для брон�
 -   Поддержка trailing commas (`trailingComma: "all"`)
 ### Frontend (Angular)
 -   **Standalone components** (без NgModules)
+-   **ChangeDetectionStrategy.OnPush** по умолчанию во всех компонентах
 -   `@Component` с `imports`, `templateUrl`, `styleUrl` (единственное число)
 -   Сигналы (`signal()`) для реактивного состояния
+-   Стилизация через Angular Material (azure-blue тема) — кастомные CSS-файлы используются только для лейаута
 -   `bootstrapApplication(App, appConfig)` — без `platformBrowserDynamic`
 -   `provideRouter(routes)` для маршрутизации
 -   `@for` вместо `*ngFor`, `<router-outlet />` (самозакрывающийся)

@@ -1,0 +1,50 @@
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+}
+
+.state-card {
+  max-width: 32rem;
+  margin: 2rem auto 0;
+}
+
+.error-text {
+  color: #f44336;
+  margin: 0;
+}
+
+.empty-state {
+  text-align: center;
+}
+
+.container {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.event-card .duration {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin-right: auto;
+}
