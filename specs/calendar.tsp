@@ -88,6 +88,9 @@ namespace CalendarApi {
     @doc("Получить список всех типов событий (публично)")
     @get op list(): EventType[];
 
+    @doc("Получить тип события по ID (публично)")
+    @get op getEventType(@path id: uuid): EventType | NotFoundError;
+
     @doc("Создать новый тип события (admin)")
     @post op create(@body body: CreateEventTypeRequest): EventType | ValidationError;
 
