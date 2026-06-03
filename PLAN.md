@@ -137,21 +137,104 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 ## Этап 5: Интеграция фронтенда с Prism
 
-- [ ] Запустить `prism mock` и `ng serve` (из `frontend/`) одновременно
-- [ ] Проверить все сценарии:
+- [x] Запустить `prism mock` и `ng serve` (из `frontend/`) одновременно
+- [x] Проверить все сценарии:
   - Список типов событий
   - Создание/редактирование/удаление типа (admin)
   - Выбор слота и создание брони (гость)
   - Получение ошибки 409 при конфликте
   - Получение 404 при несуществующем типе
   - Список броней (admin)
-- [ ] Исправить ошибки, если фронт не соответствует контракту
+- [x] Исправить ошибки, если фронт не соответствует контракту
 
 ---
 
-## Этап 6: NestJS — Prisma и БД
+## Этап 6: NestJS — Репозитории (интерфейсы + in-memory)
 
-- [ ] На основе OpenAPI написать `backend/prisma/schema.prisma`:
+- [x] Создать `IEventTypesRepository` и `IBookingsRepository` (интерфейсы в `core/ports/`)
+- [x] Реализовать `InMemoryEventTypesRepository` и `InMemoryBookingsRepository` (`infrastructure/persistence/in-memory/`)
+- [x] Зарегистрировать их как синглтоны в соответствующих модулях
+- [x] Написать unit-тесты на репозитории
+
+---
+
+## Этап 7: NestJS — Модуль EventTypes
+
+- [ ] Сгенерировать модуль, сервис, контроллер
+- [ ] DTO: `CreateEventTypeDto`, `UpdateEventTypeDto`
+- [ ] `EventTypesService` (через репозиторий):
+  - `findAll()` — все типы
+  - `findOne(id)` — по id
+  - `create(dto)` — создание
+  - `update(id, dto)` — обновление
+  - `delete(id)` — удаление
+- [ ] `EventTypesController`:
+  - `GET /api/event-types` → `findAll()`
+  - `POST /api/event-types` → `create()`
+  - `PATCH /api/event-types/:id` → `update()`
+  - `DELETE /api/event-types/:id` → `delete()`
+- [ ] Тесты (unit + e2e через Supertest)
+
+---
+
+## Этап 8: NestJS — Модуль Bookings + Slots
+
+- [ ] Сгенерировать модули/сервисы
+- [ ] DTO: `CreateBookingDto`
+- [ ] `BookingsService` (через репозиторий):
+  - `findAll()` — все будущие брони, сортировка по `startTime`
+  - `create(dto)`:
+    1. Найти `EventType` → получить `duration`
+    2. Вычислить `endTime = startTime + duration`
+    3. Проверить: `startTime` в окне [now, now + 14 дней]
+    4. Проверить overlap: `startTime < :endTime AND endTime > :startTime`
+    5. Создать `Booking`
+- [ ] `SlotsService`:
+  - `getAvailableSlots(eventTypeId, from, to)`:
+    1. Получить `duration` из `EventType`
+    2. Получить рабочее расписание (дефолтный `Schedule`)
+    3. Для каждой даты в диапазоне — проверить день недели по Schedule
+    4. Исключить даты с `DateOverride.available = false`
+    5. Сгенерировать слоты с шагом `duration` в рабочем окне дня
+    6. Отсечь слоты с `startTime < now`
+    7. Исключить занятые (пересечения с бронями)
+- [ ] Конфигурация расписания по умолчанию (in-memory):
+  - Пн–Пт, 09:00–18:00
+  - Сб–Вс — выходные
+  - Временная, до перехода на полноценный Availability модуль
+- [ ] Контроллеры:
+  - `GET /api/bookings` → `findAll()`
+  - `POST /api/bookings` → `create()`
+  - `GET /api/event-types/:id/slots?from=...&to=...` → `getAvailableSlots()`
+- [ ] Тесты (unit + e2e через Supertest)
+
+---
+
+## Этап 8.5: NestJS — Модуль Availability (расписание)
+
+- [ ] Добавить модель `AvailabilityConfig` в TypeSpec (calendar.tsp) → OpenAPI
+- [ ] Создать интерфейс `IAvailabilityRepository` в `core/ports/`
+- [ ] Реализовать `InMemoryAvailabilityRepository` (in-memory)
+- [ ] Создать модуль `AvailabilityModule` с `AvailabilityService`:
+  - Управление недельным расписанием (`Schedule`)
+  - Управление исключениями по датам (`DateOverride`)
+  - `getSchedule()` — получить активное расписание
+  - `isDateAvailable(date, from, to)` — проверка конкретной даты/окна
+- [ ] Создать контроллеры:
+  - `GET /api/availability/schedule` — получить расписание
+  - `PATCH /api/availability/schedule` — обновить расписание
+  - `GET /api/availability/overrides` — список исключений
+  - `POST /api/availability/overrides` — создать исключение
+  - `DELETE /api/availability/overrides/:id` — удалить исключение
+- [ ] Подключить `AvailabilityService` в `SlotsService` (замена in-memory конфига)
+- [ ] Добавить компонент админки `AdminAvailabilityComponent`
+- [ ] Тесты (unit + e2e)
+
+---
+
+## Этап 9: Переключение с in-memory на Prisma/PostgreSQL
+
+- [ ] Написать `prisma/schema.prisma`:
   ```prisma
   model EventType {
     id          String   @id @default(uuid())
@@ -181,54 +264,13 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
   ```bash
   cd backend && npx prisma migrate dev --name init
   ```
-- [ ] Подключить `PrismaModule` глобально в NestJS
+- [ ] Реализовать `PrismaEventTypesRepository` и `PrismaBookingsRepository`
+- [ ] Заменить `providers` в модулях — ни один сервис/контроллер не меняется
+- [ ] Удалить in-memory реализации (опционально)
 
 ---
 
-## Этап 7: NestJS — Модуль EventTypes
-
-- [ ] Сгенерировать модуль, сервис, контроллер
-- [ ] DTO: `CreateEventTypeDto`, `UpdateEventTypeDto`
-- [ ] `EventTypesService`:
-  - `findAll()` — все типы
-  - `findOne(id)` — по id
-  - `create(dto)` — создание
-  - `update(id, dto)` — обновление
-  - `delete(id)` — удаление
-- [ ] `EventTypesController`:
-  - `GET /api/event-types` → `findAll()`
-  - `POST /api/event-types` → `create()`
-  - `PATCH /api/event-types/:id` → `update()`
-  - `DELETE /api/event-types/:id` → `delete()`
-- [ ] Проверить через `curl`
-
----
-
-## Этап 8: NestJS — Модуль Bookings + Slots
-
-- [ ] Сгенерировать модули/сервисы
-- [ ] `BookingsService`:
-  - `findAll()` — все будущие брони, сортировка по `startTime`
-  - `create(dto)`:
-    1. Найти `EventType` → получить `duration`
-    2. Вычислить `endTime = startTime + duration`
-    3. Проверить: `startTime` в окне [now, now + 14 дней]
-    4. Проверить overlap: `startTime < :endTime AND endTime > :startTime`
-    5. Создать `Booking`
-- [ ] `SlotsService`:
-  - `getAvailableSlots(eventTypeId, from, to)`:
-    1. Получить `duration` из `EventType`
-    2. Получить все брони в диапазоне
-    3. Сгенерировать слоты с шагом `duration`
-    4. Исключить занятые
-- [ ] Контроллеры:
-  - `GET /api/bookings` → `findAll()`
-  - `POST /api/bookings` → `create()`
-  - `GET /api/event-types/:id/slots?from=...&to=...` → `getAvailableSlots()`
-
----
-
-## Этап 9: Переключение фронта с Prism на реальный бэкенд
+## Этап 10: Переключение фронта с Prism на реальный бэкенд
 
 - [ ] Добавить в NestJS CORS для `http://localhost:4200`
 - [ ] Поменять `baseUrl` в `ApiService` с `http://localhost:4010/api` на `http://localhost:3000/api` (или настроить proxy в Angular)
@@ -250,7 +292,7 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 ---
 
-## Этап 10: Документация и деплой
+## Этап 11: Документация и деплой
 
 - [ ] Наполнить БД seed-данными через Prisma Seed
 - [ ] Дополнить `README.md`
@@ -268,15 +310,12 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 
 | Этап | Описание | Примерное время |
 |------|----------|----------------|
-| 0 | Инициализация проектов | 30 мин |
-| 1 | TypeSpec → OpenAPI → Prism | 1–2 ч |
-| 2 | Angular сервисы и модели | 1–2 ч |
-| 3 | Публичная часть (гость) | 3–4 ч |
-| 4 | Админ-панель | 2–3 ч |
-| 5 | Интеграция фронта с Prism | 1–2 ч |
-| 6 | Prisma и БД | 1 ч |
+| 0–5 | (инициализация, спецификация, фронт) | ~8–12 ч |
+| 6 | Репозитории + in-memory | 1 ч |
 | 7 | NestJS — EventTypes | 1–2 ч |
 | 8 | NestJS — Bookings + Slots | 2–3 ч |
-| 9 | Переключение на реальный бэк | 1 ч |
-| 10 | Документация и деплой | 1–2 ч |
-| **Итого** | | **14–22 ч** |
+| 8.5 | NestJS — Availability (расписание) | 2–3 ч |
+| 9 | Переход с in-memory на Prisma/PostgreSQL | 1 ч |
+| 10 | Переключение фронта с Prism на бэк | 1 ч |
+| 11 | Документация и деплой | 1–2 ч |
+| **Итого** | | **~17–25 ч** |
