@@ -5,6 +5,8 @@ import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { HttpExceptionFilter } from './../src/core/exceptions/http-exception.filter';
 import { EventType } from './../src/core/models/event-type';
+import { Booking } from './../src/core/models/booking';
+import { Slot } from './../src/core/models/slot';
 
 describe('EventTypes (e2e)', () => {
   let app: INestApplication<App>;
@@ -141,6 +143,155 @@ describe('EventTypes (e2e)', () => {
       await request(app.getHttpServer())
         .delete('/api/event-types/550e8400-e29b-41d4-a716-446655440000')
         .expect(404);
+    });
+  });
+});
+
+describe('Bookings (e2e)', () => {
+  let app: INestApplication<App>;
+  let eventTypeId: string;
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
+    app.useGlobalFilters(new HttpExceptionFilter());
+    await app.init();
+
+    const res = await request(app.getHttpServer())
+      .post('/api/event-types')
+      .send({ title: '30 min', description: 'Desc', duration: 30 })
+      .expect(200);
+
+    eventTypeId = (res.body as EventType).id;
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  describe('GET /api/bookings', () => {
+    it('should return a list of bookings', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/bookings')
+        .expect(200);
+
+      const body = res.body as Booking[];
+      expect(Array.isArray(body)).toBe(true);
+    });
+  });
+
+  describe('POST /api/bookings', () => {
+    it('should create a new booking on a weekday', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/api/bookings')
+        .send({
+          eventTypeId,
+          guestName: 'John',
+          guestEmail: 'john@test.com',
+          startTime: '2026-06-10T10:00:00.000Z', // Wednesday
+        })
+        .expect(200);
+
+      const body = res.body as Booking;
+      expect(body.id).toBeDefined();
+      expect(body.guestName).toBe('John');
+      expect(body.guestEmail).toBe('john@test.com');
+    });
+
+    it('should return 400 on invalid body', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/api/bookings')
+        .send({ eventTypeId: 'not-a-uuid' })
+        .expect(400);
+
+      const body = res.body as { code: string };
+      expect(body.code).toBe('VALIDATION_ERROR');
+    });
+
+    it('should return 400 for past startTime', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/api/bookings')
+        .send({
+          eventTypeId,
+          guestName: 'John',
+          guestEmail: 'john@test.com',
+          startTime: '2020-01-01T10:00:00.000Z',
+        })
+        .expect(400);
+
+      const body = res.body as { code: string };
+      expect(body.code).toBe('VALIDATION_ERROR');
+    });
+
+    it('should return 409 on duplicate slot', async () => {
+      await request(app.getHttpServer())
+        .post('/api/bookings')
+        .send({
+          eventTypeId,
+          guestName: 'First',
+          guestEmail: 'first@test.com',
+          startTime: '2026-06-10T10:00:00.000Z',
+        })
+        .expect(200);
+
+      const res = await request(app.getHttpServer())
+        .post('/api/bookings')
+        .send({
+          eventTypeId,
+          guestName: 'Second',
+          guestEmail: 'second@test.com',
+          startTime: '2026-06-10T10:15:00.000Z', // overlaps with 10:00-10:30
+        })
+        .expect(409);
+
+      const body = res.body as { code: string };
+      expect(body.code).toBe('CONFLICT');
+    });
+  });
+
+  describe('GET /api/event-types/:id/slots', () => {
+    it('should return available slots on a weekday', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/event-types/${eventTypeId}/slots`)
+        .query({
+          from: '2026-06-08T00:00:00.000Z', // Monday
+          to: '2026-06-09T00:00:00.000Z', // Tuesday
+        })
+        .expect(200);
+
+      const body = res.body as Slot[];
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBe(18); // 09:00-18:00 with 30min slots
+      expect(body[0].startTime).toBeDefined();
+      expect(body[0].endTime).toBeDefined();
+    });
+
+    it('should return empty array on weekend', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/event-types/${eventTypeId}/slots`)
+        .query({
+          from: '2026-06-06T00:00:00.000Z', // Saturday
+          to: '2026-06-07T00:00:00.000Z',   // Sunday (to is exclusive)
+        })
+        .expect(200);
+
+      const body = res.body as Slot[];
+      // Saturday and Sunday should have no slots
+      expect(body.length).toBe(0);
+    });
+
+    it('should return 400 for invalid dates', async () => {
+      await request(app.getHttpServer())
+        .get(`/api/event-types/${eventTypeId}/slots`)
+        .query({ from: 'invalid', to: 'invalid' })
+        .expect(400);
     });
   });
 });
