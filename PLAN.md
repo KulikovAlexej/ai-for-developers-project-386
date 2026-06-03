@@ -180,6 +180,7 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 ## Этап 8: NestJS — Модуль Bookings + Slots
 
 - [ ] Сгенерировать модули/сервисы
+- [ ] DTO: `CreateBookingDto`
 - [ ] `BookingsService` (через репозиторий):
   - `findAll()` — все будущие брони, сортировка по `startTime`
   - `create(dto)`:
@@ -191,14 +192,43 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 - [ ] `SlotsService`:
   - `getAvailableSlots(eventTypeId, from, to)`:
     1. Получить `duration` из `EventType`
-    2. Получить все брони в диапазоне
-    3. Сгенерировать слоты с шагом `duration`
-    4. Исключить занятые
+    2. Получить рабочее расписание (дефолтный `Schedule`)
+    3. Для каждой даты в диапазоне — проверить день недели по Schedule
+    4. Исключить даты с `DateOverride.available = false`
+    5. Сгенерировать слоты с шагом `duration` в рабочем окне дня
+    6. Отсечь слоты с `startTime < now`
+    7. Исключить занятые (пересечения с бронями)
+- [ ] Конфигурация расписания по умолчанию (in-memory):
+  - Пн–Пт, 09:00–18:00
+  - Сб–Вс — выходные
+  - Временная, до перехода на полноценный Availability модуль
 - [ ] Контроллеры:
   - `GET /api/bookings` → `findAll()`
   - `POST /api/bookings` → `create()`
   - `GET /api/event-types/:id/slots?from=...&to=...` → `getAvailableSlots()`
 - [ ] Тесты (unit + e2e через Supertest)
+
+---
+
+## Этап 8.5: NestJS — Модуль Availability (расписание)
+
+- [ ] Добавить модель `AvailabilityConfig` в TypeSpec (calendar.tsp) → OpenAPI
+- [ ] Создать интерфейс `IAvailabilityRepository` в `core/ports/`
+- [ ] Реализовать `InMemoryAvailabilityRepository` (in-memory)
+- [ ] Создать модуль `AvailabilityModule` с `AvailabilityService`:
+  - Управление недельным расписанием (`Schedule`)
+  - Управление исключениями по датам (`DateOverride`)
+  - `getSchedule()` — получить активное расписание
+  - `isDateAvailable(date, from, to)` — проверка конкретной даты/окна
+- [ ] Создать контроллеры:
+  - `GET /api/availability/schedule` — получить расписание
+  - `PATCH /api/availability/schedule` — обновить расписание
+  - `GET /api/availability/overrides` — список исключений
+  - `POST /api/availability/overrides` — создать исключение
+  - `DELETE /api/availability/overrides/:id` — удалить исключение
+- [ ] Подключить `AvailabilityService` в `SlotsService` (замена in-memory конфига)
+- [ ] Добавить компонент админки `AdminAvailabilityComponent`
+- [ ] Тесты (unit + e2e)
 
 ---
 
@@ -284,7 +314,8 @@ TypeSpec → OpenAPI → Prism (mock) → Angular (фронт)
 | 6 | Репозитории + in-memory | 1 ч |
 | 7 | NestJS — EventTypes | 1–2 ч |
 | 8 | NestJS — Bookings + Slots | 2–3 ч |
+| 8.5 | NestJS — Availability (расписание) | 2–3 ч |
 | 9 | Переход с in-memory на Prisma/PostgreSQL | 1 ч |
 | 10 | Переключение фронта с Prism на бэк | 1 ч |
 | 11 | Документация и деплой | 1–2 ч |
-| **Итого** | | **~15–22 ч** |
+| **Итого** | | **~17–25 ч** |
